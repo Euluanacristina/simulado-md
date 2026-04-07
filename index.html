@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulado - Modelagem de Dados</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh}
+header{background:linear-gradient(135deg,#0d3320,#1e3a2f);padding:1.2rem 2rem;text-align:center;border-bottom:1px solid #22543d;box-shadow:0 4px 20px rgba(0,0,0,.4)}
+header h1{font-size:1.5rem;color:#68d391;letter-spacing:1px}
+header p{color:#9ae6b4;font-size:.82rem;margin-top:.3rem}
+.container{max-width:860px;margin:1.5rem auto;padding:0 1.2rem}
+.section-tabs{display:flex;justify-content:center;gap:.4rem;margin-bottom:1.2rem;flex-wrap:wrap}
+.section-tabs a{color:#718096;padding:.45rem .8rem;border:1px solid #2d3748;border-radius:6px;font-size:.8rem;transition:.2s;text-decoration:none;cursor:pointer}
+.section-tabs a:hover,.section-tabs a.active{color:#68d391;background:rgba(104,211,145,.1);border-color:#68d391}
+.card{background:#1a2a38;border:1px solid #2d3748;border-radius:10px;padding:1.3rem;margin-bottom:1rem;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:transform .12s}
+.card:hover{transform:translateY(-1px)}
+.progress-bar{position:sticky;top:0;z-index:50;height:4px;background:#1a202c}
+.progress-bar .fill{height:100%;background:#68d391;width:0%;transition:width .3s}
+.unit-badge{display:inline-block;font-size:.62rem;padding:.15rem .45rem;border-radius:10px;margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.5px}
+.unit-badge.u1{background:#805ad533;color:#d6bcfa}.unit-badge.u2{background:#3182ce33;color:#63b3ed}
+.unit-badge.u3{background:#d69e2e33;color:#f6e05e}.unit-badge.u4{background:#e53e3e33;color:#feb2b2}
+.unit-badge.u5{background:#38b2ac33;color:#4fd1c5}.unit-badge.u6{background:#ed64a633;color:#fbb6ce}
+.context-text{font-style:italic;color:#a0aec0;font-size:.8rem;line-height:1.5;margin-bottom:.6rem;padding-left:.5rem;border-left:2px solid #2d3748}
+.question-text{font-size:.92rem;line-height:1.5;margin-bottom:.2rem;color:#e2e8f0}
+.question-text strong{color:#f7fafc}
+.options{display:flex;flex-direction:column;gap:.3rem;margin-top:.5rem}
+.option{display:inline-flex;width:100%;padding:.6rem .7rem .6rem 2.2rem;background:#0d1117;border:1px solid #2d3748;border-radius:5px;color:#e2e8f0;font-size:.82rem;cursor:pointer;text-align:left;transition:all .15s;position:relative;font-family:inherit;line-height:1.4}
+.option:hover:not(.locked){background:rgba(104,211,145,.06);border-color:#68d391}
+.option.locked{cursor:default;opacity:.55}
+.option.correct{background:rgba(34,197,94,.15)!important;border-color:#22c55e!important;color:#4ade80!important;opacity:1!important}
+.option.wrong{background:rgba(239,68,68,.15)!important;border-color:#ef4444!important;color:#f87171!important;opacity:1!important}
+.option.selected{color:#68d391;border-color:#68d391}
+.opt-letter{position:absolute;left:.6rem;top:50%;transform:translateY(-50%);font-weight:600;color:#718096;font-size:.73rem;min-width:1.1em}
+.explanation{margin-top:.7rem;padding:.6rem .8rem;background:rgba(104,211,145,.07);border-left:3px solid #68d391;border-radius:0 5px 5px 0;font-size:.76rem;color:#a0aec0;line-height:1.45;display:none}
+.explanation.show{display:block}
+.score-panel{margin:.8rem 0;display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center}
+.score-badge{padding:.4rem .9rem;border-radius:6px;font-size:.82rem;font-weight:600}
+.score-info{background:rgba(99,179,237,.1);color:#63b3ed}
+.score-good{background:rgba(34,197,94,.1);color:#4ade80}
+.score-warn{background:rgba(250,204,21,.1);color:#facc15}
+.summary-card{text-align:center;margin:1.5rem auto;padding:1.5rem;max-width:450px;background:#1a2a38;border:1px solid #2d3748;border-radius:10px}
+.summary-card .grade{font-size:3.5rem;font-weight:700}
+.btn{display:inline-block;margin:1rem auto .2rem;padding:.6rem 1.5rem;background:#2d3748;border:1px solid #4a5568;border-radius:6px;color:#e2e8f0;font-size:.85rem;cursor:pointer;transition:.15s;font-family:inherit}
+.btn:hover{background:rgba(104,211,145,.1);border-color:#68d391;color:#68d391}
+footer{text-align:center;margin:2rem 0;padding:1rem;color:#4a5568;font-size:.7rem}
+@media(max-width:480px){header h1{font-size:1.1rem}.container{padding:0 .5rem}.card{padding:1rem}.option{font-size:.78rem}}
+</style>
+</head>
+<body>
+<div class="progress-bar"><div class="fill" id="progress"></div></div>
+<header>
+  <h1>Simulado — Modelagem de Dados</h1>
+  <p>22 questões de múltipla escolha — Fundamentos de Banco de Dados</p>
+</header>
+<div class="container">
+  <div class="section-tabs">
+    <a href="#" class="active" data-filter="all">Todas</a>
+    <a href="#" data-filter="1">SGBD</a>
+    <a href="#" data-filter="2">Relacional</a>
+    <a href="#" data-filter="3">Modelos de BD</a>
+    <a href="#" data-filter="4">Entidade-Relacional</a>
+    <a href="#" data-filter="5">Ciclo de Vida</a>
+    <a href="#" data-filter="6">Segurança</a>
+  </div>
+  <div class="score-panel score-info" id="scorePanel">
+    <span class="score-badge score-info">Respondidas: <span id="answered">0</span>/<span id="totalC">22</span></span>
+    <span class="score-badge score-good">Acertos: <span id="hits">0</span></span>
+    <span class="score-badge score-warn">Erros: <span id="misses">0</span></span>
+  </div>
+  <div id="questions"></div>
+  <button class="btn" id="resetBtn" style="display:none" onclick="location.reload()">Refazer Simulado</button>
+</div>
+<footer>
+  Feito para estudo — Simulado de Fundamentos de Banco de Dados / Modelagem de Dados<br>
+  Questões baseadas nos slides e materiais de aula do professor.
+</footer>
+<script>
+const questions=[
+// ===== TEMA 1: SGBD =====
+{unit:1,context:'',q:'O que é um Banco de Dados?',opts:['Um software para criar imagens.','Um sistema que armazena e organiza informações.','Um antivírus para proteger computadores.','Um dispositivo de hardware exclusivo para redes.'],correct:1,expl:'Um Banco de Dados é um sistema estruturado que armazena e organiza informações de forma eficiente, permitindo acesso, manipulação e gestão dos dados.'},
+
+{unit:1,context:'',q:'Qual é a função de um SGBD (Sistema Gerenciador de Banco de Dados)? Explique com suas palavras.',opts:['Compilar códigos-fonte de aplicações web.','Gerenciar, organizar, acessar, controlar e proteger as informações de um banco de dados.','Gerenciar hardware e periféricos de rede.','Criar interfaces gráficas para sites.'],correct:1,expl:'O SGBD é um software cuja finalidade é gerenciar as informações de um banco de dados: organizar, acessar, controlar e proteger os dados. Ele isola o acesso dos usuários ao banco, garantindo segurança e integridade.'},
+
+{unit:1,context:'',q:'Qual é a principal diferença entre uma aplicação que acessa o banco de dados DIRETAMENTE e uma que utiliza um SGBD como INTERMEDIÁRIO?',opts:['Na acesso direto, a aplicação precisa de regras específicas de segurança e integridade; com SGBD, é o próprio SGBD que garante isso.','Não há diferença, as duas formas funcionam de maneira idêntica.','Com SGBD, a aplicação fica mais lenta.','Com acesso direto, o banco de dados não precisa existir.'],correct:0,expl:'Quando aplicações acessam o banco diretamente, cada uma precisa implementar regras de segurança e integridade. Com o SGBD como intermediário, é ele quem garante segurança e integridade, dispensando regras específicas em cada aplicação.'},
+
+{unit:1,context:'De acordo com os slides, existem diferentes SGBDs no mercado — alguns gratuitos e outros pagos.',q:'Assinale a alternativa que apresenta apenas SGBDs mencionados no material:',opts:['Photoshop, Excel e Word.','SQL Server, Oracle, MySQL e PostgreSQL.','Linux, Android e iOS.','Java, Python e JavaScript.'],correct:1,expl:'Os SGBDs mencionados são: SQL Server (pago), Oracle (pago), MySQL (gratuito) e PostgreSQL (gratuito).'},
+
+{unit:1,context:'',q:'Qual é a finalidade técnica de realizar um Backup de Dados?',opts:['Acelerar a consulta ao banco de dados.','Recuperar dados para restaurar informações em caso de perda dos originais ou acidentes operacionais.','Criptografar as senhas dos usuários.','Compactar o banco de dados para economizar espaço.'],correct:1,expl:'A finalidade do Backup é a recuperação de dados para restaurar informações em caso de perda dos arquivos originais ou em caso de acidentes operacionais com os equipamentos.'},
+
+{unit:1,context:'Em um plano de recuperação de desastres, determinam-se as opções de backup: armazenamento em nuvem, backups com fornecedores e backups fora da sede.',q:'Por que os backups NÃO devem ser mantidos no mesmo local físico (on-site) dos dados originais?',opts:['Porque o espaço em disco seria insuficiente.','Porque em caso de desastre natural ou incidente no local, ambos seriam perdidos.','Porque backups on-site são mais lentos.','Porque a legislação proíbe backups no mesmo local.'],correct:1,expl:'Para responder a eventos de desastres naturais (incêndios, enchentes, roubos), os backups não devem ficar no mesmo local — caso contrário, o mesmo evento que destrói os dados originais também destruiria as cópias.'},
+
+{unit:1,context:'O plano de recuperação de desastres inclui opções como armazenamento em nuvem e backups fora da sede.',q:'Como funciona um Firewall em uma rede de computadores?',opts:['Ele compacta os dados para reduzir o tráfego.','Ele monitora o tráfego de entrada e saída, decidindo permitir ou bloquear conforme regras de segurança.','Ele faz backup automático de todos os arquivos.','Ele criptografa todos os e-mails enviados.'],correct:1,expl:'O Firewall é um dispositivo de segurança da rede que monitora o tráfego de rede de entrada e saída e decide permitir ou bloquear tráfegos específicos, de acordo com um conjunto definido de regras de segurança.'},
+
+{unit:1,context:'A educação dos usuários é uma das camadas de defesa mencionadas nos slides.',q:'Quais comportamentos devem ser incentivados na camada de "Educação dos Usuários"?',opts:['Compartilhar senhas com a equipe para facilitar o acesso.','Trocar a senha periodicamente, não divulgar a senha e informar sobre dados sensíveis.','Desativar o firewall para melhorar a velocidade.','Usar apenas dispositivos pessoais no trabalho.'],correct:1,expl:'Na camada de Educação dos Usuários, deve-se conscientizar sobre: troca de senha periodicamente, não divulgar a senha e informar sobre dados sensíveis.'},
+
+// ===== TEMA 2: BANCO RELACIONAL =====
+{unit:2,context:'',q:'Qual é a ideia central que fundamenta a proposta do modelo relacional?',opts:['As informações são representadas em árvores hierárquicas.','As informações podem ser representadas em tabelas, nas quais as linhas representam as informações cadastradas.','As informações são armazenadas em documentos XML.','As informações são organizadas por grafos e redes.'],correct:1,expl:'A proposta do modelo relacional baseia-se na ideia de que as informações em uma base de dados podem ser representadas em tabelas, nas quais as linhas representam as informações cadastradas.'},
+
+{unit:2,context:'',q:'Quais são os três aspectos básicos que compõem o modelo relacional?',opts:['Consulta, Atualização e Exclusão.','Estrutura, Integridade e Manipulação.','Hardware, Software e Usuários.','Concepção, Elicitação e Elaboração.'],correct:1,expl:'O modelo relacional tem três aspectos básicos: Estrutura (dados como tabelas), Integridade (restrições que as tabelas devem satisfazer) e Manipulação (operações com as tabelas: juntar, selecionar, excluir etc).'},
+
+{unit:2,context:'Observe: matrícula | nome | curso',q:'Nesse exemplo, "nome" e "curso" representam:',opts:['Registros.','Tabelas.','Atributos (campos ou colunas).','Bancos de dados.'],correct:2,expl:'Em uma tabela de banco de dados, "nome" e "curso" são ATRIBUTOS — também chamados de campos ou colunas. Eles representam as informações agrupadas e armazenadas na entidade.'},
+
+{unit:2,context:'',q:'Qual é a diferença entre ATRIBUTO e REGISTRO (linha) em uma tabela?',opts:['Atributo é a coluna/campo da tabela; Registro é um conjunto de atributos dispostos logicamente em uma linha.','Atributo é a tabela inteira; Registro é uma coluna.','Não há diferença, são sinônimos.','Atributo é o SGBD; Registro é o banco de dados.'],correct:0,expl:'Atributo = coluna/campo da tabela (ex: nome, curso). Registro (linha) = conjunto de atributos logicamente dispostos formando uma entrada/linha da tabela.'},
+
+{unit:2,context:'',q:'O que caracteriza a fase inicial de um projeto de banco de dados?',opts:['O levantamento das necessidades de dados dos prováveis usuários dos bancos.','A implementação definitiva do SGBD.','O treinamento dos usuários finais.','A criação do backup de segurança.'],correct:0,expl:'A fase inicial do projeto de banco de dados é caracterizada pelo levantamento das necessidades de dados dos prováveis usuários destes bancos.'},
+
+// ===== TEMA 3: MODELOS DE BD =====
+{unit:3,context:'O modelo relacional é estruturado em tabelas. Outros modelos de banco de dados existem.',q:'No modelo HIERÁRQUICO, como os dados são organizados?',opts:['Em tabelas com linhas e colunas, como uma planilha.','Em uma estrutura de árvore, onde cada registro filho tem apenas um registro pai.','Em uma rede de conexões livres entre registros.','Em documentos JSON e XML.'],correct:1,expl:'O modelo hierárquico organiza os dados em uma estrutura de ÁRVORE, onde cada "nó filho" tem apenas um "nó pai". Os dados são dispostos em níveis hierárquicos.'},
+
+{unit:3,context:'O modelo em rede é outro modelo clássico de banco de dados.',q:'Qual é a principal diferença entre o modelo EM REDE e o modelo HIERÁRQUICO?',opts:['O modelo em rede é mais restritivo, pois cada nó só pode ter um pai.','O modelo em rede permite que um nó filho tenha vários pais, sendo mais flexível.','Não há diferença entre eles.','O modelo em rede não permite relacionamentos entre tabelas.'],correct:1,expl:'O modelo em REDE é mais flexível que o hierárquico porque permite que um registro filho tenha MÚLTIPLOS pais, criando uma rede de conexões, ao contrário da árvore rígida do hierárquico.'},
+
+{unit:3,context:'Existem diversos modelos de banco de dados além do relacional.',q:'No modelo ORIENTADO A OBJETOS, como as informações são representadas e em que tipo de sistemas ele é utilizado?',opts:['Em tabelas; é utilizado em sistemas corporativos simples.','Como objetos, encapsulando dados e comportamentos; é utilizado em sistemas complexos como CAD e multimídia.','Em arquivos de texto simples; é usado em blogs.','Em grafos; é usado em redes sociais.'],correct:1,expl:'O modelo orientado a objetos representa informações como objetos (encapsulando dados e comportamentos). É utilizado em sistemas complexos que requerem modelagem rica de dados, como CAD, multimídia e sistemas de engenharia.'},
+
+{unit:3,context:'O modelo de documentos é um dos tipos de banco de dados modernos.',q:'O modelo de DOCUMENTOS geralmente utiliza quais formatos de arquivo e para que tipo de dados é mais indicado?',opts:['CSV e TXT; indicado para dados numéricos estruturados.','JSON e XML; indicado para dados semiestruturados e flexíveis.','PDF e DOCX; indicado para relatórios formais.','PNG e JPG; indicado para dados multimídia.'],correct:1,expl:'O modelo de documentos utiliza formatos como JSON e XML. É mais indicado para dados semiestruturados e flexíveis, onde cada documento pode ter uma estrutura diferente.'},
+
+// ===== TEMA 4: ENTIDADE-RELACIONAL =====
+{unit:4,context:'',q:'O que é uma ENTIDADE no contexto de modelagem de dados? Dê exemplos.',opts:['É qualquer software instalado no servidor. Exemplo: Windows, Linux.','É um objeto ou indivíduo do mundo real com existência própria (pessoa, carro) ou conceitual (projeto, departamento), cujas características desejamos registrar.','É apenas uma tabela no banco de dados.','É um tipo de antivírus.'],correct:1,expl:'Uma entidade é um objeto ou indivíduo do mundo real que possui existência própria (pessoa, carro, produto) ou existência conceitual (projeto, departamento), e cujas características desejamos registrar no banco.'},
+
+{unit:4,context:'',q:'O que são ATRIBUTOS e por quais outros nomes eles podem ser chamados?',opts:['São as tabelas do banco, também chamadas de SGBDs.','São as relações entre entidades, também chamadas de vínculos.','São as informações agrupadas e armazenadas em tabelas, também conhecidas como "campos" ou "colunas".','São os backups do sistema, também chamados de cópias.'],correct:2,expl:'Atributos são as informações agrupadas e armazenadas em tabelas. São equivalentes aos campos ou colunas de uma tabela.'},
+
+{unit:4,context:'',q:'O que define um REGISTRO (ou linha) em uma tabela de banco de dados?',opts:['É uma coluna da tabela que armazena os dados.','É uma chave estrangeira que conecta duas tabelas.','É um conjunto de atributos logicamente dispostos em uma entidade ou tabela (uma entrada completa).','É o nome do banco de dados.'],correct:2,expl:'O registro (ou linha) é um conjunto de atributos logicamente dispostos em uma entidade ou tabela. Cada linha representa uma instância completa daquela entidade.'},
+
+{unit:4,context:'Quando duas tabelas possuem um relacionamento N para N...',q:'O que normalmente é criado para resolver um relacionamento N para N?',opts:['Uma chave duplicada.','Uma tabela associativa.','Um novo banco de dados inteiro.','Um campo obrigatório adicional.'],correct:1,expl:'Quando há um relacionamento muitos-para-muitos (N:N) entre duas entidades, normalmente é criada uma TABELA ASSOCIATIVA (ou tabela de junção) para decompor esse relacionamento em relacionamentos um-para-muitos.'},
+
+{unit:4,context:'',q:'Quais são os quatro elementos fundamentais que compõem um banco de dados?',opts:['Tabelas, Colunas, Linhas e Índices.','Dados, Hardware, Software e Usuários.','SQL, HTML, CSS e JavaScript.','Backup, Firewall, Antivírus e Segurança.'],correct:1,expl:'Um banco de dados é composto por 4 elementos fundamentais: Dados, Hardware, Software e Usuários.'},
+
+// ===== TEMA 5: CICLO DE VIDA =====
+{unit:5,context:'',q:'Quais são as quatro etapas principais do processo de MODELAGEM de banco de dados?',opts:['Planejamento, Execução, Controle e Entrega.','Concepção, Elicitação, Elaboração e Negociação.','Análise, Projeto, Codificação e Teste.','Modelagem, Implementação, Operação e Manutenção.'],correct:1,expl:'As quatro etapas da modelagem são: Concepção (entender a necessidade do cliente), Elicitação (conversar com usuários para colher informações), Elaboração (criar modelos para formalizar requisitos) e Negociação (verificar viabilidade das sugestões dos clientes).'},
+
+{unit:5,context:'',q:'O que ocorre durante a etapa de ELICITAÇÃO na modelagem de banco de dados?',opts:['Os modelos são apresentados aos clientes para validação.','Conversas com os usuários do software para colher informações e definir procedimentos que deverão estar presentes no sistema.','São definidos os recursos orçamentários do projeto.','O banco de dados é implementado em produção.'],correct:1,expl:'Na Elicitação, o analista conversa com os usuários do software com o objetivo de colher mais informações e definir quais procedimentos realizados deverão estar presentes no sistema.'},
+
+{unit:5,context:'',q:'Qual é o objetivo da etapa de ELABORAÇÃO na modelagem de banco de dados?',opts:['Entender a necessidade do cliente e estabelecer os objetivos principais.','Apresentar o modelo para que os clientes sugiram novos itens.','Criar modelos para a formalização dos requisitos, permitindo encontrar falhas ou esquecimentos tanto dos clientes quanto do analista.','Implementar o banco de dados em produção.'],correct:2,expl:'Na Elaboração, são criados modelos para a formalização dos requisitos, permitindo encontrar falhas ou esquecimentos tanto dos clientes quanto do próprio analista de sistemas.'},
+
+{unit:5,context:'',q:'O que ocorre durante a etapa de NEGOCIAÇÃO na modelagem?',opts:['O preço do projeto é negociado com o fornecedor.','O modelo é descartado e recomeçado.','Com o modelo apresentado, os clientes podem sugerir novos itens, sendo necessário verificar a viabilidade das sugestões apresentadas.','O projeto é aprovado automaticamente sem mudanças.'],correct:2,expl:'Na Negociação, com o modelo apresentado, os clientes podem sugerir novos itens, tornando-se necessário verificar a viabilidade das sugestões.'},
+
+{unit:5,context:'O ciclo de vida de um banco de dados é composto por várias fases sequenciais.',q:'No ciclo de vida de um banco de dados, a fase em que o banco começa a ser utilizado pelos sistemas é chamada de:',opts:['Teste.','Projeto.','Implementação.','Operação.'],correct:3,expl:'A OPERAÇÃO é a fase em que o banco de dados começa a ser utilizado efetivamente pelos sistemas em produção. É a etapa de uso ativo do sistema.'},
+
+// ===== TEMA 6: SEGURANÇA =====
+{unit:6,context:'O SGBD possui camadas de defesa para proteção dos dados.',q:'Quais são as 8 camadas de defesa citadas para a proteção dos dados no material?',opts:['Backup, Firewall, Antivírus, Segurança E-mail, Segurança Web, Educação dos Usuários, Segurança Wireless e Recuperação de Desastres.','Login, Senha, Token, Biometria, Cartão, Chave, Certificado e Firewall.','Criptografia, Descriptografia, Compressão, Backup, Restauração, Teste, Validação e Monitoramento.','Hardware, Software, Sistema Operacional, Rede, Protocolo, Serviço, Aplicação e Usuário.'],correct:0,expl:'As 8 camadas de defesa são: Educação dos Usuários, Segurança Wireless, Backup de Dados, Recuperação de Desastres, Políticas de Segurança, Firewall, Segurança de E-mail e Segurança Web.'},
+
+{unit:6,context:'',q:'Qual é o objetivo principal de um software Antivírus?',opts:['Monitorar o tráfego de rede da empresa.','Proteger o computador contra programas maliciosos que podem danificar o sistema ou roubar dados.','Gerenciar senhas de forma segura.','Fazer backup automático de todos os arquivos.'],correct:1,expl:'O objetivo principal do Antivírus é proteger o computador contra software malicioso (malware) — vírus, worms, trojans etc. — que podem danificar o sistema, roubar dados ou comprometer a segurança.'},
+
+{unit:6,context:'A segurança de redes sem fio é uma das camadas de defesa.',q:'Por que a segurança de redes sem fio (Wireless) é considerada crítica?',opts:['Porque redes Wi-Fi são mais lentas que redes cableadas.','Porque vulnerabilidades na rede sem fio podem expor dados desprotegidos — mesmo que o computador tenha boa proteção, outros dispositivos na mesma rede podem ser comprometidos.','Porque redes Wi-Fi não permitem conexão com bancos de dados.','Porque apenas redes sem fio são usadas por hackers.'],correct:1,expl:'A segurança Wireless é crítica porque vulnerabilidades na rede sem fio podem expor dados desprotegidos. Mesmo que o computador individual tenha boa proteção, outros dispositivos conectados à mesma rede sem fio podem ser comprometidos se a rede não for segura.'},
+];
+
+// ===== LOGIC =====
+let answered=0,hits=0,misses=0;
+const total=questions.length;
+
+function renderQuestions(filter){
+  const el=document.getElementById("questions");
+  el.innerHTML="";
+  const filtered=filter==="all"?questions:questions.filter(q=>q.unit===parseInt(filter));
+  document.getElementById("totalC").textContent=filtered.length;
+  filtered.forEach((q,i)=>{
+    const qIdx=questions.indexOf(q);
+    const card=document.createElement("div");
+    card.className="card";
+    let ctxHTML=q.context?`<div class="context-text">${q.context}</div>`:"";
+    const letters="ABCDE";
+    let optsHTML=q.opts.map((o,j)=>
+      `<button class="option" onclick="answer(this,${qIdx},${j})"><span class="opt-letter">${letters[j]})</span>${o}</button>`
+    ).join("");
+    card.innerHTML=`<span class="unit-badge u${q.unit}">${getUnitName(q.unit)}</span><p class="question-text"><strong>Questão ${qIdx+1}.</strong> ${q.q}</p>${ctxHTML}<div class="options">${optsHTML}</div><div class="explanation" id="expl-${qIdx}">${q.expl}</div>`;
+    el.appendChild(card);
+  });
+}
+
+function getUnitName(u){
+  return {1:'SGBD',2:'Banco Relacional',3:'Modelos de BD',4:'Entidade-Relacional',5:'Ciclo de Vida',6:'Segurança'}[u]||'';
+}
+
+function answer(btn,qi,oi){
+  const q=questions[qi];
+  const card=btn.closest(".card");
+  const btns=card.querySelectorAll(".option");
+  btns.forEach(b=>{b.classList.add("locked");b.style.pointerEvents="none"});
+  btn.classList.add("selected");
+  if(oi===q.correct){btn.classList.add("correct");hits++}
+  else{btn.classList.add("wrong");btns[q.correct].classList.add("correct");misses++}
+  answered++;
+  document.getElementById("answered").textContent=answered;
+  document.getElementById("hits").textContent=hits;
+  document.getElementById("misses").textContent=misses;
+  document.getElementById("progress").style.width=(answered/total*100)+"%";
+  document.getElementById("expl-"+qi).classList.add("show");
+  if(answered===total){showSummary();document.getElementById("resetBtn").style.display="inline-block"}
+}
+
+function showSummary(){
+  const pct=Math.round(hits/total*100);
+  let grade,msg;
+  if(pct>=80){grade="#4ade80";msg="Excelente! Você está pronto para a prova!"}
+  else if(pct>=60){grade="#facc15";msg="Bom, revise os pontos fracos!"}
+  else{grade="#f87171";msg="Estude mais o material e tente novamente!"}
+  const el=document.createElement("div");
+  el.className="summary-card";
+  el.innerHTML=`<p style="color:#a0aec0;font-size:.82rem">Simulado finalizado!</p><div class="grade" style="color:${grade}">${pct}%</div><p style="font-size:.95rem;margin:.3rem 0 .8rem">${msg}</p><span class="score-badge score-good">Acertos: ${hits}</span>&nbsp;<span class="score-badge score-warn">Erros: ${misses}</span>`;
+  document.getElementById("questions").after(el);
+  el.scrollIntoView({behavior:"smooth"});
+}
+
+document.querySelectorAll(".section-tabs a").forEach(a=>{
+  a.addEventListener("click",e=>{
+    e.preventDefault();
+    document.querySelectorAll(".section-tabs a").forEach(x=>x.classList.remove("active"));
+    a.classList.add("active");
+    renderQuestions(a.dataset.filter);
+  });
+});
+
+renderQuestions("all");
+</script>
+</body>
+</html>
